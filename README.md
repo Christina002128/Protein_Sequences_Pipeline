@@ -31,43 +31,44 @@ Every time you want to re-run the program, you might consider restarting the ter
 For Competent Python3 Code-writer:<br>
 In the python3 environment, import " ICA2_function" and execute "ICA2_script.py" to start the program. <br>
 There are 7 functions in "ICA2_function.py", and "ICA2_script.py" is for calling and execute these functions.<br>
-<br>
-Function Details<br>
-1. ICA2_function.pro_tx_seq() let user input protein name and taxonomic group ID or name, ask user if they want to get only not partial sequences or all sequences. And then check if the input is valid or if the retrieve result is not 0. If the input is not valid or retrieve 0 result, let user input again until is valid. Then retrieve a query using ‘esearch’ and get the counts of result. If the retrieve result is more than 1000 sequences, then ask the user if they want to download or not. If not, ask the user if they want to retype or just quit the program. Download the sequences in fasta format and save it into ‘”protaxpar_label”.fa" file. <br>
+<br><br>
+Function Details
+1. ICA2_function.pro_tx_seq() let user input protein name and taxonomic group ID or name, ask user if they want to get only not partial sequences or all sequences. And then check if the input is valid or if the retrieve result is not 0. If the input is not valid or retrieve 0 result, let user input again until is valid. Then retrieve a query using “esearch” and get the counts of result. If the retrieve result is more than 1000 sequences, then ask the user if they want to download or not. If not, ask the user if they want to retype or just quit the program. Download the sequences in fasta format and save it into “‘protaxpar_label’.fa" file. 
 At the end, it returns a list [protein, taxonomy, protaxpar_label] containing protein and taxonomy name and a label for naming the file. There are two kinds of "protaxpar_label" based on the way of retrieve: 
-"“protein”_”taxonomy”_all" for retrieving all sequences and 
-"“protein”_”taxonomy”_no_par" retrieving only not partial sequences.<br>
+"‘protein’_’taxonomy’ _all" for retrieving all sequences and 
+"‘protein’_’taxonomy’_no_par" retrieving only not partial sequences.
 dataset=ICA2_function.pro_tx_seq()
-<br>
-2. ICA2_function.create_df(protaxpar_label) function is for making a dataframe  with 9 columns: ['protein_accession', 'protein_name', 'genus', 'species', 'full_species_name', 'length', 'header', 'sequence', 'raw_seq‚Äô]. It splits the header go get genus and species of each protein squence, calculates the sequence length. (For some partial sequences or other kinds of sequences, it sometimes has unclear header(don‚Äôt have ‘[species]’ format), then the columns extracted from header will simply equals to all contents after accession number. At the end, return the dataframe and output it into ‘”protaxpar_label”_summary.csv’ file. <br>
+
+2. ICA2_function.create_df(protaxpar_label) function is for making a dataframe  with 9 columns: ['protein_accession', 'protein_name', 'genus', 'species', 'full_species_name', 'length', 'header', 'sequence', 'raw_seq’]. It splits the header go get genus and species of each protein squence, calculates the sequence length. (For some partial sequences or other kinds of sequences, it sometimes has unclear header(don’t have “[species]” format), then the columns extracted from header will simply equals to all contents after accession number. At the end, return the dataframe and output it into “‘protaxpar_label’_summary.csv” file. 
 df=ICA2_function.create_df(dataset[2])
-<br>
-3. ICA2_function.count_species(protaxpar_label) function can check the diversity of species and genus of the result. Load the dataframe and count the number of unique genus and species and total number of proteins. The percentage of protein per genus or protein per species is also calculated. Print those results, display the first 10 rows of the dataframe with columns [‚Äòprotein_accession',"protein_name",'genus','species'] sorted by genus name and save the dataframe into ‘”protaxpar_label”_summary_species.csv’ file. User can choose to see number of head rows or tail rows or choose to see the rows of specific genus multiple times in a loop.
+
+3. ICA2_function.count_species(protaxpar_label) function can check the diversity of species and genus of the result. Load the dataframe and count the number of unique genus and species and total number of proteins. The percentage of protein per genus or protein per species is also calculated. Print those results, display the first 10 rows of the dataframe with columns [‘protein_accession',"protein_name",'genus','species'] sorted by genus name and save the dataframe into “‘protaxpar_label’_summary_species.csv” file. User can choose to see number of head rows or tail rows or choose to see the rows of specific genus multiple times in a loop.
 ICA2_function.count_species(protaxpar_label)
-<br>
+
 Use a conditional check ask if the user want to continue for the alignment. If not, quit the program. 
-<br>
-4. ICA2_function.seq_len_subset(dataset) function checks the distribution of sequence length and generate a subset group if needed. First, print out the calculation summary of sequence length, display the histogram of the distribution of sequence length, save the histogram into "“protaxpar_label”.seqLenHis.png". If the difference of sequences length is too big: (maxLen-minLen)/maxLen “ 0.2, then ask the user if they want to choose a subset for the following analysis based on the range of sequence length. User input the minimum and maximum length, run in loop until the input is valid. Generate a new dataframe that contain only the sequences with length inside that range. Output the filtered dataframe into "“sub_label”_subgroup.csv" file and the filtered sequences into "“sub_label”_len.fa" file. Return the filename label of the subset. <br>
-There are two kinds of "sub_label" based on the length range.<br>
-If user chose a minimum and maximum length: <br>
-sub_label = "“protaxpar_label”_”min”_”max”"<br>
-If not choosing a length range:  <br>
-sub_label = "“protaxpar_label”_whole" <br>
+
+4. ICA2_function.seq_len_subset(dataset) function checks the distribution of sequence length and generate a subset group if needed. First, print out the calculation summary of sequence length, display the histogram of the distribution of sequence length, save the histogram into "‘protaxpar_label’.seqLenHis.png". If the difference of sequences length is too big: (maxLen-minLen)/maxLen ‘ 0.2, then ask the user if they want to choose a subset for the following analysis based on the range of sequence length. User input the minimum and maximum length, run in loop until the input is valid. Generate a new dataframe that contain only the sequences with length inside that range. Output the filtered dataframe into "‘sub_label’_subgroup.csv" file and the filtered sequences into "‘sub_label’_len.fa" file. Return the filename label of the subset. 
+There are two kinds of "sub_label" based on the length range.
+If user chose a minimum and maximum length: 
+sub_label = ‘protaxpar_label’_’min’_’max’
+If not choosing a length range:  
+sub_label = ‘protaxpar_label’_whole
 sub_label=ICA2_function.seq_len_subset(dataset)
-<br>
-5. ICA2_function.conservation(dataset,sub_label) is to determine, and plot, the level of protein sequence conservation. Align the sequences using "clustalo", output to "“sub_label”.align.msf" file. Get basic information for the alignment using "infoalign" function. Make the information into dataframe, sort it by "Identity" from high to low and print on screen, output to "“sub_label”.infoalign.csv" file. Generate conservation sequence using "cons" function, save it into "“sub_label”_align.cons" file and display it on screen. Plot the level of conservation usning "plotcon" function and save into "“sub_label”_plotcon.png " file, display on screen. <br>
+
+5. ICA2_function.conservation(dataset,sub_label) is to determine, and plot, the level of protein sequence conservation. Align the sequences using "clustalo", output to "‘sub_label’.align.msf" file. Get basic information for the alignment using "infoalign" function. Make the information into dataframe, sort it by "Identity" from high to low and print on screen, output to "‘sub_label’.infoalign.csv" file. Generate conservation sequence using "cons" function, save it into "‘sub_label’_align.cons" file and display it on screen. Plot the level of conservation usning "plotcon" function and save into "‘sub_label’_plotcon.png " file, display on screen. 
 ICA2_function.conservation(dataset,sub_label)
-<br>
+
 Ask user if they want to choose a new subset and redo the alignment, or continue scanning with motif, or quit the program.
-<br>
-6. ICA2_function.seq_out(sub_label) function is to output fasta file for each sequence in the subgroup.<br>
+
+6. ICA2_function.seq_out(sub_label) function is to output fasta file for each sequence in the subgroup.
 ICA2_function.seq_out(sub_label)
-<br>
-7. ICA2_function.find_motifs(sub_label) is to scan with motifs from PROSITE database. First, scan motif for each sequence in parallel, get all the motif names from all files, count the number of each motif in total. Display the counts of motifs sorted in a descending order. Save the result into "“sub_label”patmatmotifs_summary.csv" file.<br>
-ICA2_function.find_motifs(sub_label)<br>
+
+7. ICA2_function.find_motifs(sub_label) is to scan with motifs from PROSITE database. First, scan motif for each sequence in parallel, get all the motif names from all files, count the number of each motif in total. Display the counts of motifs sorted in a descending order. Save the result into "‘sub_label’patmatmotifs_summary.csv" file.
+ICA2_function.find_motifs(sub_label)
+
 
 FlowChart:<br>
-“img width="538" alt="image" src="https://github.com/Christina002128/Protein_Sequences_Pipeline/assets/115002249/df512253-0e32-4069-980f-633cd5a7c255"“
+<img width="538" alt="image" src=https://github.com/Christina002128/Protein_Sequences_Pipeline/assets/115002249/df512253-0e32-4069-980f-633cd5a7c255>
 <br>
 
 Output Example: <br>
@@ -89,27 +90,17 @@ Use pyruvate dehydrogenase from ascomycete fungi (taxonID 4890) as example: <br>
 <br>
 Only showing the first few lines.
 
-<br>Output file:
-<br>“protaxpar_label”.fa	retrieved sequences
-<br>“protaxpar_label”_summary.csv	sequences information table
-<br>“protaxpar_label”.seqLenHis.png	histogram of sequences length
-<br>“protaxpar_label”_summary_species.csv	protein and corresponding species
-<br>““sub_label”“_subgroup.csv	subgroup information table
-<br>“sub_label”_len.fa	sequences of subgroup
-<br>“sub_label”.align.msf	aligned sequences
-<br>“sub_label”.infoalign.csv	alignment result of each sequence
-<br>“sub_label”_align.cons	conservation sequence
-<br>“sub_label”_plotcon.png	Image showing the level of conservation
-<br>“sub_label”patmatmotifs_summary.csv	result summary of scanning with motifs
+Output file:<br>
+<img width="736" alt="image" src="https://github.com/Christina002128/Protein_Sequences_Pipeline/assets/115002249/744e489a-c23b-4bc9-a8ab-aad0d37167a8">
 <br>
-In the "“sub_label”.infoalign.csv " file, the description of each column are shown here.<br>
-`Name - name of the sequence.<br>
-`SeqLen - length of the sequence when all gap characters are removed.<br>
-`AlignLen - length of the sequence including internal gap characters i.e. gaps at the start or the end are not included.<br>
-`Gaps - number of gaps e.g. 'AAA---AAA' is 1 gap (and 3 gap characters long (see GapLen)).<br>
-`GapLen - total number of internal gap characters, see the 3 gap characters above. This is the sum total of all of the internal gap characters in this sequence.
-<br>`Ident - number of characters that are identical to the specified reference sequence (uppercase 'A' is identical to lowercase 'a').
-<br>`Similar - number of characters which are non-identical - which score “ 0 in the comparison matrix when compared to the reference sequence, but which are not identical.<br>
-`Different - number of characters which score “= 0 in the comparison matrix when compared to the reference sequence.<br>
-`%Change - a simple measure of the percentage change as compared to the reference sequence: (AlignLen - Ident) * 100 / AlignLen
-<br>
+In the "<sub_label>.infoalign.csv " file, the description of each column are shown here.<br>
+
+•	Name - name of the sequence.
+•	SeqLen - length of the sequence when all gap characters are removed.
+•	AlignLen - length of the sequence including internal gap characters i.e. gaps at the start or the end are not included.
+•	Gaps - number of gaps e.g. 'AAA---AAA' is 1 gap (and 3 gap characters long (see GapLen)).
+•	GapLen - total number of internal gap characters, see the 3 gap characters above. This is the sum total of all of the internal gap characters in this sequence.
+•	Ident - number of characters that are identical to the specified reference sequence (uppercase 'A' is identical to lowercase 'a').
+•	Similar - number of characters which are non-identical - which score > 0 in the comparison matrix when compared to the reference sequence, but which are not identical.
+•	Different - number of characters which score <= 0 in the comparison matrix when compared to the reference sequence.
+%Change - a simple measure of the percentage change as compared to the reference sequence: (AlignLen - Ident) * 100 / AlignLen
